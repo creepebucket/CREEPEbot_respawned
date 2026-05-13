@@ -1,0 +1,12 @@
+
+[database]
+mongo_connection_string = "mongodb://user:password@ip:port/"
+
+[nonebot]
+# 这里的配置会被转发到.env, 无需设置
+
+[logging]
+# 日志级别 debug/info/warn/error/crit
+level = "debug"
+# 是否接管nonebot的日志
+inject_nonebot = true
