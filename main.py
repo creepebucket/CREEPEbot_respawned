@@ -4,8 +4,9 @@ import tomllib
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
 
-from lib import logger
-from lib.database import connect_database
+from lib import logger, database
+from lib.database import config
+from lib.database.config import set_toml_config
 from lib.rule_registry import scan_and_register, get_registry
 
 banner = r'''
@@ -16,7 +17,7 @@ banner = r'''
 \____/_/ |_/_____/_____/_/  _/_____/_.___/\____/\__/ /
          / __/ -_|_-</ _ \/ _ `/ |/|/ / _ \/ -_) _  / 
         /_/  \__/___/ .__/\_,_/|__,__/_//_/\__/\_,_/  
-孩子们我回来了        /_/            2024.7.18-2026.5.12
+孩子们我回来了        /_/            2024.7.18-2026.5.12 
 '''
 
 # -------------------------
@@ -30,17 +31,18 @@ if __name__ == '__main__':
 
     # 解析配置并连接数据库
     with open('config.toml', 'rb') as f:
-        config = tomllib.load(f)
+        toml_config = tomllib.load(f)
 
     # 按情况接管nb2的日志
-    if config['logging']['inject_nonebot']:
+    if toml_config['logging']['inject_nonebot']:
         logger.inject_nonebot_logger()
 
-    logger.set_log_level(config['logging']['level'])
+    logger.set_log_level(toml_config['logging']['level'])
 
     logger.debug('配置文件已解析成功')
 
-    connect_database(config['database']['mongo_connection_string'])
+    database.connect_database(toml_config['database']['mongo_connection_string'])
+    config.connect_database(toml_config['database']['mongo_connection_string'])
 
     logger.debug('数据库已连接')
 
@@ -49,10 +51,14 @@ if __name__ == '__main__':
         os.remove('.env')
 
     with open('.env', 'w') as f:
-        for key, value in config['nonebot'].items():
+        for key, value in toml_config['nonebot'].items():
             f.write(str(key).upper() + '=' + str(value).replace("'", '"') + '\n')
 
     logger.debug('nonebot配置转发完成')
+
+    # 存储配置
+    set_toml_config(toml_config)
+
     logger.info('CREEPEbot respawned **堂堂复活**! 孩子们我回来了')
 
     # 注册事件处理规则

@@ -10,3 +10,7 @@ mongo_connection_string = "mongodb://user:password@ip:port/"
 level = "debug"
 # 是否接管nonebot的日志
 inject_nonebot = true
+
+[general]
+# 超级用户列表
+superusers = [1111111111, 1234567890]

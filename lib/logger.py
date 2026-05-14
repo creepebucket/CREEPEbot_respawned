@@ -105,8 +105,8 @@ def inject_nonebot_logger():
 
             log(f'BOT `{bot}` 接受到 由 `{sender}` 发送的**私聊**消息: `{content}` , 消息id: `{id}`', 1, stack)
 
-        #else:
-        #    print(record)
+        else:
+            log(message, 0, stack)
 
     logger.add(custom_sink,level=0,filter=default_filter,serialize=False)
 

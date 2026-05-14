@@ -31,9 +31,14 @@ def _load_module_from_path(file_path: Path):
     从给定 .py 文件动态加载模块，执行其中代码。
     使用文件路径作为模块名以避免冲突（简单把路径中的特殊字符替换掉）。
     """
-    # 生成唯一模块名（例如：dir_subdir_file）
-    relative = file_path.relative_to(file_path.anchor)  # 取相对根路径
-    module_name = str(relative).replace('/', '_').replace('\\', '_').replace('.py', '')
+    module_name = None
+    parts = file_path.resolve().parts
+    if 'nb_plugins' in parts:
+        i = parts.index('nb_plugins')
+        module_name = '.'.join(parts[i:]).replace('.py', '')
+    else:
+        relative = file_path.relative_to(file_path.anchor)
+        module_name = str(relative).replace('/', '_').replace('\\', '_').replace('.py', '')
 
     # 如果已经加载过同名模块，先移除（避免重复加载时旧代码残留）
     if module_name in sys.modules:

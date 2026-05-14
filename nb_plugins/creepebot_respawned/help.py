@@ -1,23 +1,60 @@
 import html
+import re
 import time
 
 from lib import logger
 from lib.chat.context import Context
 from lib.chat.html_renderer import render
-from lib.chat.rule import Rule
 from lib.rule_registry import register, get_registry
+
+from .rules import Command
 
 
 @register
-class Help(Rule):
+class Help(Command):
     def __init__(self):
-        super().__init__('帮助', '查看帮助, 也可根据关键词进行搜索', '/help <搜索关键词/页码>', 0)
+        super().__init__('hlp', '帮助', '查看帮助, 也可根据关键词进行搜索', '/help [参数] <关键词>', 0, True)
 
     def check(self, context: Context) -> bool:
-        return context.get_message_text().endswith('/help')
+        return re.match(r'/help.*', context.get_message())
 
     async def handle(self, context: Context) -> bool:
-        await context.send_message(await render(generate_help_html(get_registry())))
+        message = context.get_message()
+
+        # 无参情况
+        if message == '/help':
+            await context.send_message(await render(generate_help_html(get_registry())))
+
+        # 有参数
+        elif re.match(r'/help -[nud]* .+', message):
+            arg = re.search(r'/help -([nud]*) .+', message).group(1)
+            key = re.search(r'/help -[nud]* (.+)', message).group(1)
+            found = []
+
+            for rule in get_registry():
+                if 'n' in arg:
+                    if key in rule.name: found.append(rule)
+                if 'u' in arg:
+                    if key in rule.usage: found.append(rule)
+                if 'd' in arg:
+                    if key in rule.desc: found.append(rule)
+
+            await context.send_message(await render(generate_help_html(found)))
+
+        # 无参数
+        elif re.match(r'/help .+', message):
+            key = re.search(r'/help (.+)', message).group(1)
+            found = []
+
+            for rule in get_registry():
+                if key in rule.name: found.append(rule)
+
+            await context.send_message(await render(generate_help_html(found)))
+
+        # 其他情况
+        else:
+            await context.send_message('未知指令结构. 使用/help -u help了解详情')
+
         return False
 
 
@@ -34,17 +71,19 @@ def generate_help_html(commands: list) -> str:
     # 1. 动态生成指令列表的 HTML 行
     cmd_rows_html = ""
     for cmd in commands:
+        rid = cmd.id if hasattr(cmd, 'id') else cmd.get('id', '?')
         name = cmd.name if hasattr(cmd, 'name') else cmd.get('name', 'UNKNOWN')
         usage = cmd.usage if hasattr(cmd, 'usage') else cmd.get('usage', 'UNKNOWN')
         desc = cmd.desc if hasattr(cmd, 'desc') else cmd.get('desc', 'UNKNOWN')
 
-        # 【关键转义】防止 < > 破坏 HTML 结构
+        rid = html.escape(str(rid))
         name = html.escape(str(name))
         usage = html.escape(str(usage))
         desc = html.escape(str(desc))
 
         cmd_rows_html += f"""
                 <div class="cmd-row">
+                    <div class="cmd-id">{rid}</div>
                     <div class="cmd-name">{name}</div>
                     <div class="cmd-usage">{usage}</div>
                     <div class="cmd-desc">{desc}</div>
@@ -149,7 +188,7 @@ def generate_help_html(commands: list) -> str:
         .cmd-row {
             display: grid; 
             /* 调整列宽占比，保障名字和用法有足够空间 */
-            grid-template-columns: 140px 220px 1fr; 
+            grid-template-columns: 50px 140px 220px 1fr; 
             gap: 24px; /* 增加列间距 */
             padding: 16px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
@@ -227,6 +266,7 @@ def generate_help_html(commands: list) -> str:
 
             <div class="cmd-table">
                 <div class="cmd-row header-row">
+                    <div>ID</div>
                     <div>Module Name // 名称</div>
                     <div>Syntax // 用法</div>
                     <div>Description // 描述与功能说明</div>
