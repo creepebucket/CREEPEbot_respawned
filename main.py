@@ -6,7 +6,7 @@ import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
 
 from lib import logger, database
-from lib.database import config
+from lib.database import config, cache
 from lib.database.config import set_toml_config
 from lib.mcsmanager import set_api_key, set_base_url
 from lib.rule_registry import scan_and_register, get_registry
@@ -56,6 +56,7 @@ if __name__ == '__main__':
 
     database.connect_database(toml_config['database']['mongo_connection_string'])
     config.connect_database(toml_config['database']['mongo_connection_string'])
+    cache.connect_database(toml_config['database']['mongo_connection_string'])
 
     logger.debug('数据库已连接')
 

@@ -50,7 +50,7 @@ def api(method: str, path: str, query_keys=None):
             request_params = {k: v for k, v in request_params.items() if v is not None}
 
             # 3. 基础查询参数：始终携带 API Key
-            query_params = {'api_key': API_KEY}
+            query_params = {'apikey': API_KEY}
             headers = {'x-requested-with': 'xmlhttprequest'}
 
             # 4. 根据 HTTP 方法构建请求

@@ -1,6 +1,11 @@
 from typing import Dict, Optional, List, Any
 
+from lib import logger
 from lib.mcsmanager import api
+from lib.mcsmanager.general import get_overview
+from lib.database.cache import MongoCache
+
+instance_nickname_cache = MongoCache('mcsmanager_instance_nickname_map')
 
 
 @api('GET', 'api/service/remote_service_instances')
@@ -454,3 +459,104 @@ def reinstall_instance(daemonId: str, uuid: str, targetUrl: str, title: str, des
       "time": 1718594177859
     }
     """
+
+
+def rebuild_instance_nickname_cache() -> List[Dict[str, str]]:
+    overview = get_overview()
+    daemon_list = overview['data']['remote']
+
+    cache_data = []
+    for daemon in daemon_list:
+        daemon_id = daemon['uuid']
+
+        resp = get_instance_list(daemonId=daemon_id, status='', page=1, page_size=100)
+        max_page = resp['data']['maxPage']
+        instance_list = resp['data']['data']
+
+        for page in range(2, max_page + 1):
+            resp = get_instance_list(daemonId=daemon_id, status='', page=page, page_size=100)
+            instance_list += resp['data']['data']
+
+        for instance in instance_list:
+            cache_data.append({
+                'nickname': instance['config']['nickname'],
+                'daemonId': daemon_id,
+                'uuid': instance['instanceUuid']
+            })
+
+    instance_nickname_cache.set(cache_data)
+    return cache_data
+
+
+def resolve_daemonid_uuid_by_nickname(nickname: str) -> Dict[str, str]:
+    cache_data = instance_nickname_cache.get()
+    if cache_data is None:
+        cache_data = rebuild_instance_nickname_cache()
+
+    for item in cache_data:
+        if item['nickname'] == nickname:
+            return item
+
+    cache_data = rebuild_instance_nickname_cache()
+    for item in cache_data:
+        if item['nickname'] == nickname:
+            return item
+
+    raise KeyError(f'实例昵称不存在: {nickname}')
+
+
+def get_instance_detail_by_nickname(nickname: str) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return get_instance_detail(uuid=ids['uuid'], daemonId=ids['daemonId'])
+
+
+def update_instance_by_nickname(nickname: str, config: Dict[str, Any]) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return update_instance(uuid=ids['uuid'], daemonId=ids['daemonId'], config=config)
+
+
+def delete_instance_by_nickname(nickname: str, deleteFile: bool = False) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    resp = delete_instance(daemonId=ids['daemonId'], uuids=[ids['uuid']], deleteFile=deleteFile)
+    rebuild_instance_nickname_cache()
+    return resp
+
+
+def start_instance_by_nickname(nickname: str) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return start_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
+
+
+def stop_instance_by_nickname(nickname: str) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return stop_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
+
+
+def restart_instance_by_nickname(nickname: str) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return restart_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
+
+
+def kill_instance_by_nickname(nickname: str) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return kill_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
+
+
+def update_instance_task_by_nickname(nickname: str, task_name: str = 'update') -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return update_instance_task(uuid=ids['uuid'], daemonId=ids['daemonId'], task_name=task_name)
+
+
+def send_command_by_nickname(nickname: str, command: str) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return send_command(uuid=ids['uuid'], daemonId=ids['daemonId'], command=command)
+
+
+def get_output_log_by_nickname(nickname: str, size: Optional[int] = None) -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return get_output_log(uuid=ids['uuid'], daemonId=ids['daemonId'], size=size)
+
+
+def reinstall_instance_by_nickname(nickname: str, targetUrl: str, title: str, description: str = '') -> Dict:
+    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    return reinstall_instance(daemonId=ids['daemonId'], uuid=ids['uuid'], targetUrl=targetUrl, title=title, description=description)
