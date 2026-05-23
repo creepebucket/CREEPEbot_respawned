@@ -164,7 +164,7 @@ class GlobalConfig(MongoConfig):
     def __init__(self):
         super().__init__('global')
 
-global_config = GlobalConfig
+global_config = GlobalConfig()
 
 toml_config_dict = {}
 

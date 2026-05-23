@@ -9,7 +9,9 @@ from lib import logger, database
 from lib.database import config, cache
 from lib.database.config import set_toml_config
 from lib.mcsmanager import set_api_key, set_base_url
+from lib.mcsmanager.instance import rebuild_instance_nickname_cache
 from lib.rule_registry import scan_and_register, get_registry
+from nb_plugins.creepebot_respawned.chat_sync import start_sync
 
 banner = r'''
    __________  ________________  ________          __ 
@@ -36,15 +38,28 @@ if __name__ == '__main__':
         toml_config: Dict[str, Dict[str, Any]] = tomllib.load(f)
 
     # 设置MCSM api key / base url
+    mcsm_ready = True
+
     if 'mcsm' in toml_config.keys() and 'key' in toml_config['mcsm'].keys():
         set_api_key(toml_config['mcsm']['key'])
     else:
         logger.warn('MCSManager API KEY **未设置**! 无法使用Minecraft服务器管理功能')
+        mcsm_ready = False
 
     if 'mcsm' in toml_config.keys() and 'base_url' in toml_config['mcsm'].keys():
         set_base_url(toml_config['mcsm']['base_url'])
     else:
         logger.warn('MCSManager BASE URL **未设置**! 无法使用Minecraft服务器管理功能')
+        mcsm_ready = False
+
+    cache.connect_database(toml_config['database']['mongo_connection_string'])
+    database.connect_database(toml_config['database']['mongo_connection_string'])
+    config.connect_database(toml_config['database']['mongo_connection_string'])
+
+    logger.debug('数据库已连接')
+
+    # 重建缓存
+    if mcsm_ready: rebuild_instance_nickname_cache()
 
     # 按情况接管nb2的日志
     if toml_config['logging']['inject_nonebot']:
@@ -53,12 +68,6 @@ if __name__ == '__main__':
     logger.set_log_level(toml_config['logging']['level'])
 
     logger.debug('配置文件已解析成功')
-
-    database.connect_database(toml_config['database']['mongo_connection_string'])
-    config.connect_database(toml_config['database']['mongo_connection_string'])
-    cache.connect_database(toml_config['database']['mongo_connection_string'])
-
-    logger.debug('数据库已连接')
 
     # 将toml配置复制到nb .env
     if os.path.exists('.env'):
@@ -82,8 +91,11 @@ if __name__ == '__main__':
     # nb2, 启动!
     nonebot.init()
     driver = nonebot.get_driver()
-    driver.register_adapter(Adapter)
 
+    # 启动聊天转发
+    if mcsm_ready: driver.on_startup(start_sync)
+
+    driver.register_adapter(Adapter)
     nonebot.load_builtin_plugins('echo')  # 内置插件
     nonebot.load_plugins('nb_plugins')  # 本地插件
 

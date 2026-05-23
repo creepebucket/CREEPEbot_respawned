@@ -30,6 +30,9 @@ class Help(Command):
             found = []
 
             for rule in get_registry():
+                if not isinstance(rule, Command):
+                    continue
+
                 if 'n' in arg:
                     if key in rule.name: found.append(rule)
                 if 'u' in arg:

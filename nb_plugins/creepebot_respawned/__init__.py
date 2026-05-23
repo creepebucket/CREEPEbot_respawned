@@ -27,7 +27,7 @@ async def got_message(bot: Bot, event: Event):
 
                     continue
 
-                logger.debug(f'此条消息已被处理器 `{rule.name}` ({rule}) 处理')
+                if hasattr(rule, 'id'): logger.debug(f'此条消息已被处理器 `{rule.name}` ({rule}) 处理')
 
                 if await rule.handle(context):
                     break

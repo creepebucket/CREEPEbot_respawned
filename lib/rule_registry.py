@@ -56,6 +56,8 @@ def scan_and_register(root_dir: str, pattern: str = "*.py"):
     递归扫描 root_dir 下所有匹配 pattern 的文件，动态加载并自动注册。
     默认扫描所有 .py 文件，可通过 pattern 过滤（如 "plugin_*.py"）。
     """
+    global _registry
+    _registry.clear()
     root = Path(root_dir).resolve()
     if not root.is_dir():
         raise NotADirectoryError(f"{root_dir} 不是一个有效目录")
@@ -70,5 +72,4 @@ def scan_and_register(root_dir: str, pattern: str = "*.py"):
             # 记录加载失败的文件，但不中断整个扫描
             logger.error(f"警告: 无法加载 {py_file} -> `{e}`")
 
-    global _registry
     _registry = sorted(_registry, key=lambda t: t.priority, reverse=True)

@@ -488,7 +488,7 @@ def rebuild_instance_nickname_cache() -> List[Dict[str, str]]:
     return cache_data
 
 
-def resolve_daemonid_uuid_by_nickname(nickname: str) -> Dict[str, str]:
+def get_instance_ids(nickname: str) -> Dict[str, str]:
     cache_data = instance_nickname_cache.get()
     if cache_data is None:
         cache_data = rebuild_instance_nickname_cache()
@@ -506,57 +506,57 @@ def resolve_daemonid_uuid_by_nickname(nickname: str) -> Dict[str, str]:
 
 
 def get_instance_detail_by_nickname(nickname: str) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return get_instance_detail(uuid=ids['uuid'], daemonId=ids['daemonId'])
 
 
 def update_instance_by_nickname(nickname: str, config: Dict[str, Any]) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return update_instance(uuid=ids['uuid'], daemonId=ids['daemonId'], config=config)
 
 
 def delete_instance_by_nickname(nickname: str, deleteFile: bool = False) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     resp = delete_instance(daemonId=ids['daemonId'], uuids=[ids['uuid']], deleteFile=deleteFile)
     rebuild_instance_nickname_cache()
     return resp
 
 
 def start_instance_by_nickname(nickname: str) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return start_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
 
 
 def stop_instance_by_nickname(nickname: str) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return stop_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
 
 
 def restart_instance_by_nickname(nickname: str) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return restart_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
 
 
 def kill_instance_by_nickname(nickname: str) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return kill_instance(uuid=ids['uuid'], daemonId=ids['daemonId'])
 
 
 def update_instance_task_by_nickname(nickname: str, task_name: str = 'update') -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return update_instance_task(uuid=ids['uuid'], daemonId=ids['daemonId'], task_name=task_name)
 
 
 def send_command_by_nickname(nickname: str, command: str) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return send_command(uuid=ids['uuid'], daemonId=ids['daemonId'], command=command)
 
 
 def get_output_log_by_nickname(nickname: str, size: Optional[int] = None) -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return get_output_log(uuid=ids['uuid'], daemonId=ids['daemonId'], size=size)
 
 
 def reinstall_instance_by_nickname(nickname: str, targetUrl: str, title: str, description: str = '') -> Dict:
-    ids = resolve_daemonid_uuid_by_nickname(nickname)
+    ids = get_instance_ids(nickname)
     return reinstall_instance(daemonId=ids['daemonId'], uuid=ids['uuid'], targetUrl=targetUrl, title=title, description=description)
