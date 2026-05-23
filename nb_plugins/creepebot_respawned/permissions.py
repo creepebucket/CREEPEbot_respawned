@@ -1,12 +1,11 @@
 import re
-from selectors import SelectSelector
 
 from lib import logger
 from lib.chat.context import Context
 from lib.database.config import PersonalConfig
 from lib.rule_registry import register
 
-from .rules import Command
+from lib.chat.rules import Command
 
 
 @register
@@ -94,7 +93,7 @@ class Tag(Command):
 class Role(Command):
 
     def __init__(self):
-        super().__init__('rol', '设置身份', '设置某人为用户/管理员', '/role <qid/at消息> <user/admin>', bypass_enable_check=True)
+        super().__init__('rle', '设置身份', '设置某人为用户/管理员', '/role <qid/at消息> <user/admin>', bypass_enable_check=True)
 
     def check(self, context: Context) -> bool:
         return context.get_message().startswith('/role')

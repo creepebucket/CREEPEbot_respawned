@@ -1,5 +1,6 @@
 import os
 import tomllib
+from typing import Dict, Any
 
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
@@ -7,6 +8,7 @@ from nonebot.adapters.onebot.v11 import Adapter
 from lib import logger, database
 from lib.database import config
 from lib.database.config import set_toml_config
+from lib.mcsmanager import set_api_key, set_base_url
 from lib.rule_registry import scan_and_register, get_registry
 
 banner = r'''
@@ -31,7 +33,18 @@ if __name__ == '__main__':
 
     # 解析配置并连接数据库
     with open('config.toml', 'rb') as f:
-        toml_config = tomllib.load(f)
+        toml_config: Dict[str, Dict[str, Any]] = tomllib.load(f)
+
+    # 设置MCSM api key / base url
+    if 'mcsm' in toml_config.keys() and 'key' in toml_config['mcsm'].keys():
+        set_api_key(toml_config['mcsm']['key'])
+    else:
+        logger.warn('MCSManager API KEY **未设置**! 无法使用Minecraft服务器管理功能')
+
+    if 'mcsm' in toml_config.keys() and 'base_url' in toml_config['mcsm'].keys():
+        set_base_url(toml_config['mcsm']['base_url'])
+    else:
+        logger.warn('MCSManager BASE URL **未设置**! 无法使用Minecraft服务器管理功能')
 
     # 按情况接管nb2的日志
     if toml_config['logging']['inject_nonebot']:

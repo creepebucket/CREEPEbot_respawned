@@ -269,7 +269,7 @@
         </div>
 
         <div class="footer">
-            <span>BOT_ENGINE_CORE_V3</span>
+            <span>CREEPEBOT_RESPAWNED</span>
             <span>TS: 1698249000 // UTC+8</span>
         </div>
     </div>
