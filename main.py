@@ -7,6 +7,7 @@ from nonebot.adapters.onebot.v11 import Adapter
 
 from message_source.mc import start_sync
 from lib import logger, database
+from lib.backup.auto import start_auto_backup
 from lib.database import config, cache
 from lib.database.config import set_toml_config
 from lib.mcsmanager import set_api_key, set_base_url
@@ -94,6 +95,7 @@ if __name__ == '__main__':
 
     # 启动聊天转发
     if mcsm_ready: driver.on_startup(start_sync)
+    if mcsm_ready: driver.on_startup(start_auto_backup)
 
     driver.register_adapter(Adapter)
     nonebot.load_builtin_plugins('echo')  # 内置插件
