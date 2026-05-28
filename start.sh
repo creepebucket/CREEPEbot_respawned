@@ -9,6 +9,6 @@ fi
 
 python3 -m pip install -r requirements.txt
 python3 -m pip install nonebot2[fastapi]
-python3 -m playwright install chromium
+python3 -m playwright install firefox
 
 python3 main.py

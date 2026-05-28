@@ -39,7 +39,7 @@ def _ensure_playwright():
         raise HtmlRenderError(
             'playwright 未安装，无法渲染 HTML 为图片。请安装依赖：\n'
             '  pip install playwright\n'
-            '  python -m playwright install chromium'
+            '  python -m playwright install firefox'
         ) from e
     return async_playwright
 
@@ -88,14 +88,7 @@ async def render_html_to_png(html: str, *, options: HtmlRenderOptions = HtmlRend
 
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(
-                headless=True,
-                args=[
-                    '--disable-dev-shm-usage',
-                    '--disable-extensions',
-                    '--no-sandbox',
-                ],
-            )
+            browser = await p.firefox.launch(headless=True)
             try:
                 context = await browser.new_context(
                     viewport={'width': options.viewport_width, 'height': 720},
