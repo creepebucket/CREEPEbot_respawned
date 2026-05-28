@@ -20,7 +20,7 @@ class InGameBackup(Rule):
         nickname = context.chat_session.session_id
         cwd = get_instance_cwd_by_nickname(nickname)
 
-        if message in ('!!backup', '!!backup list'):
+        if message in ('!!back', '!!back list'):
             backups = list_backup(cwd)
             if len(backups) == 0:
                 await context.send_message('没有备份记录')

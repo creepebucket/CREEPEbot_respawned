@@ -58,7 +58,7 @@ class BackupList(QqCommand):
         args = message.split(' ')
 
         if len(args) < 2 or args[1] == '':
-            await context.send_message('指令格式错误! 使用/help -u /backup_list查看详情')
+            await context.send_message('指令格式错误! 使用/help -u /backlist查看详情')
             return False
 
         nickname = args[1]
