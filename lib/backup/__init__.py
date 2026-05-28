@@ -59,6 +59,7 @@ def start_backup(dir: str, name: str):
     abs_dir, _, blob_dir, manifest_dir = _get_backup_paths(dir)
     os.makedirs(blob_dir, exist_ok=True)
     os.makedirs(manifest_dir, exist_ok=True)
+    compressor = zstd.ZstdCompressor(level=ZSTD_LEVEL, threads=-1)
 
     # 尝试获取上一次的备份记录，用于实现增量备份（加速）
     prev_doc = backup_collection.find_one({'source_dir': abs_dir}, sort=[('time', -1)])
@@ -89,18 +90,23 @@ def start_backup(dir: str, name: str):
         else:
             # 文件发生了改变或者是新文件（慢路径），计算文件的 xxhash64 摘要
             hasher = xxhash.xxh3_64()
-            with open(abs_path, 'rb') as f:
-                # 分块读取，防止大文件撑爆内存 (每次 1MB)
-                for chunk in iter(lambda: f.read(1024 * 1024), b''):
-                    hasher.update(chunk)
-            file_hash = hasher.hexdigest()
             changed_files += 1
+
+            tmp_blob_path = os.path.join(blob_dir, f'.tmp_{current_time}_{changed_files}.zst')
+            with open(abs_path, 'rb') as src, open(tmp_blob_path, 'wb') as dst:
+                with compressor.stream_writer(dst) as writer:
+                    # 分块读取，防止大文件撑爆内存 (每次 1MB)
+                    for chunk in iter(lambda: src.read(1024 * 1024), b''):
+                        hasher.update(chunk)
+                        writer.write(chunk)
+            file_hash = hasher.hexdigest()
 
             # 去重机制：检查由哈希命名的 blob 是否已存在，如果不存在才进行压缩存储
             blob_path = os.path.join(blob_dir, f'{file_hash}.zst')
-            if not os.path.exists(blob_path):
-                with open(abs_path, 'rb') as src, open(blob_path, 'wb') as dst:
-                    zstd.ZstdCompressor(level=ZSTD_LEVEL).copy_stream(src, dst)
+            if os.path.exists(blob_path):
+                os.remove(tmp_blob_path)
+            else:
+                os.replace(tmp_blob_path, blob_path)
 
         # 记录该文件在本次备份中的状态
         backup_files.append({'path': rel_path, 'size': size, 'mtime_ns': mtime_ns, 'hash': file_hash})

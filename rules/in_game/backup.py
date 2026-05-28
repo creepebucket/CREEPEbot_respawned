@@ -1,7 +1,7 @@
 from lib.backup import start_backup, list_backup, restore_backup
 from lib.chat.context import Context
 from lib.chat.rule import Rule
-from lib.mcsmanager.instance import get_instance_cwd_by_nickname
+from lib.mcsmanager.instance import get_instance_cwd_by_nickname, stop_instance_by_nickname, start_instance_by_nickname
 from lib.rule_registry import register
 
 
@@ -36,7 +36,10 @@ class InGameBackup(Rule):
 
         if len(args) == 3 and args[1] == 'restore' and args[2] != '':
             try:
-                restore_backup(cwd, int(args[2]))
+                target_time = int(args[2])
+                stop_instance_by_nickname(nickname)
+                restore_backup(cwd, target_time)
+                start_instance_by_nickname(nickname)
             except ValueError:
                 await context.send_message('time 必须是数字')
                 return False

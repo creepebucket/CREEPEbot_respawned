@@ -10,7 +10,7 @@ from lib.backup.auto import (
 )
 from lib.chat.context import Context
 from lib.chat.rules import QqCommand
-from lib.mcsmanager.instance import get_instance_cwd_by_nickname
+from lib.mcsmanager.instance import get_instance_cwd_by_nickname, stop_instance_by_nickname, start_instance_by_nickname
 from lib.rule_registry import register
 
 
@@ -109,7 +109,9 @@ class BackupRestore(QqCommand):
             await context.send_message(f'找不到给定实例: {nickname}')
             return False
 
+        stop_instance_by_nickname(nickname)
         restore_backup(cwd, target_time)
+        start_instance_by_nickname(nickname)
         await context.send_message(f'恢复完成: {nickname} <- {target_time}')
         return False
 
