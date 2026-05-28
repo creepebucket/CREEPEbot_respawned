@@ -76,29 +76,6 @@ def _wrap_html_fragment(fragment: str, *, width: int) -> str:
         f'<body>{fragment}</body>'
         '</html>'
     )
-"""
-
-[database]
-# 你的数据库连接
-mongo_connection_string = "mongodb://mongo_6KJa3W:mongo_ANrm5j@192.168.31.31:27017/"
-
-[nonebot]
-host = "0.0.0.0"
-port = 9999
-driver = "~fastapi"
-
-[logging]
-level = "info"
-inject_nonebot = true
-
-[general]
-superusers = [3327018890]
-
-[mcsm]
-base_url = "http://127.0.0.1:23333/"
-key = "c1b00179773c422080f41112372b3df4"
-ignored = ["bot"]
-"""
 
 async def render_html_to_png(html: str, *, options: HtmlRenderOptions = HtmlRenderOptions()) -> bytes:
     """将 HTML 字符串渲染为 PNG bytes。"""

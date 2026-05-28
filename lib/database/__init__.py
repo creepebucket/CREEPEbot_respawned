@@ -18,3 +18,6 @@ def connect_database(connection: str):
     # 加载各集合
     config_collection = database['config']
     backup_collection = database['backup']
+    from lib.backup import auto
+    from lib import backup
+    backup.backup_collection = auto.backup_collection = backup_collection
