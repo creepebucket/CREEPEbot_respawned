@@ -61,6 +61,6 @@ class InGameAutoBackup(Rule):
             await context.send_message('已开启自动备份\n' + format_auto_backup_task(task))
             return False
 
-        await context.send_message('用法: !!autobackup [status] | !!autobackup on <min> [keep] [prefix] | !!autobackup off | !!autobackup run')
+        await context.send_message('用法: !!aback [status] | !!aback on <min> [keep] [prefix] | !!aback off | !!aback run')
         return False
 

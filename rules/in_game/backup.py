@@ -11,7 +11,7 @@ class InGameBackup(Rule):
         super().__init__('游戏内备份')
 
     def check(self, context: Context) -> bool:
-        return context.chat_session.is_mc_chat() and context.get_message().startswith('!!backup')
+        return context.chat_session.is_mc_chat() and context.get_message().startswith('!!back')
 
     async def handle(self, context: Context) -> bool:
         message = context.get_message()
@@ -44,5 +44,5 @@ class InGameBackup(Rule):
             await context.send_message(f'恢复完成: {args[2]}')
             return False
 
-        await context.send_message('用法: !!backup [list] | !!backup start <name> | !!backup restore <time>')
+        await context.send_message('用法: !!back [list] | !!back start <name> | !!back restore <time>')
         return False

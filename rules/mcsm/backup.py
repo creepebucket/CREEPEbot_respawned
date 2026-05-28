@@ -117,7 +117,12 @@ class BackupRestore(QqCommand):
 @register
 class AutoBackup(QqCommand):
     def __init__(self):
-        super().__init__('abk', '自动备份', '管理实例自动备份配置', '/aback [实例] [status|on|off|run] ...')
+        super().__init__(
+            'abk',
+            '自动备份',
+            '管理实例自动备份配置 默认 keep=24 prefix=auto)，群聊需先 /cmd -e abk',
+            '/aback | /aback <实例> | /aback <实例> status | /aback <实例> on <min> [keep=24] [prefix=auto] | /aback <实例> off | /aback <实例> run',
+        )
 
     def check(self, context: Context) -> bool:
         return context.get_message().startswith('/aback')
@@ -126,7 +131,7 @@ class AutoBackup(QqCommand):
         message = context.get_message()
         args = message.split(' ')
 
-        if message == '/auto_backup':
+        if message in ('/aback', '/auto_backup'):
             tasks = get_auto_backup_tasks()
             if len(tasks) == 0:
                 await context.send_message('未配置自动备份')
@@ -165,7 +170,7 @@ class AutoBackup(QqCommand):
 
         if action == 'on':
             if len(args) < 4 or args[3] == '':
-                await context.send_message('指令格式错误! 使用/help -u /auto_backup查看详情')
+                await context.send_message('指令格式错误! 使用/help -u /aback查看详情')
                 return False
 
             try:
@@ -190,5 +195,5 @@ class AutoBackup(QqCommand):
             await context.send_message('已开启自动备份\n' + format_auto_backup_task(task))
             return False
 
-        await context.send_message('用法: /auto_backup [实例] [status|on|off|run] ...')
+        await context.send_message('用法: /aback [实例] [status|on|off|run] ...')
         return False
