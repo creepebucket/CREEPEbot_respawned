@@ -13,6 +13,11 @@ from lib.mcsmanager.instance import get_output_log_by_nickname, get_all_instance
 from message_source.api import distribute_event
 
 log_hashes: Dict = {}
+ignored = []
+
+def set_ignored(l: List):
+    global ignored
+    ignored = l
 
 def get_logs_hash(logs: List[str]) -> str:
     return hashlib.md5('\n'.join(logs).encode()).hexdigest()
@@ -21,6 +26,8 @@ def get_logs_hash(logs: List[str]) -> str:
 async def sync():
     sender = PersonalConfig(0)
     for nickname in get_all_instance_nicknames():
+        if nickname in ignored: continue
+
         logs: List = get_output_log_by_nickname(nickname)['data'].splitlines()
 
         if nickname not in log_hashes:

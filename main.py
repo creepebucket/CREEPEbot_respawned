@@ -5,6 +5,7 @@ from typing import Dict, Any
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
 
+from message_source import mc
 from message_source.mc import start_sync
 from lib import logger, database
 from lib.backup.auto import start_auto_backup
@@ -58,6 +59,8 @@ if __name__ == '__main__':
     config.connect_database(toml_config['database']['mongo_connection_string'])
 
     logger.debug('数据库已连接')
+
+    if mcsm_ready: mc.set_ignored(toml_config['mcsm']['ignored'] if 'ignored' in toml_config['mcsm'].keys() else [])
 
     # 重建缓存
     if mcsm_ready: rebuild_instance_nickname_cache()

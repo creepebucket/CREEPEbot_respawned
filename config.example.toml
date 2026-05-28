@@ -24,3 +24,5 @@ superusers = [1111111111, 1234567890]
 # base_url = "http://127.0.0.1:23333/"
 # 你的API key
 # key = "YOUR_KEY"
+# 日志转发忽略的实例名称(防止循环转发)
+# ignored = ["bot"]
