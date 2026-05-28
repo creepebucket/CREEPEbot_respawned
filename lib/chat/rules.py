@@ -1,7 +1,7 @@
 from lib.chat.rule import Rule
 
 
-class Command(Rule):
+class QqCommand(Rule):
 
     def __init__(self, id: str, name: str, desc: str, usage: str, priority: int = 0, bypass_enable_check: bool = False):
         """

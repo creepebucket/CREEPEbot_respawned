@@ -504,10 +504,21 @@ def get_instance_ids(nickname: str) -> Dict[str, str]:
 
     raise KeyError(f'实例昵称不存在: {nickname}')
 
+def get_all_instance_nicknames() -> List[str]:
+    cache_data = instance_nickname_cache.get()
+    if cache_data is None:
+        cache_data = rebuild_instance_nickname_cache()
+
+    return [i['nickname'] for i in cache_data]
+
 
 def get_instance_detail_by_nickname(nickname: str) -> Dict:
     ids = get_instance_ids(nickname)
     return get_instance_detail(uuid=ids['uuid'], daemonId=ids['daemonId'])
+
+def get_instance_cwd_by_nickname(nickname: str) -> str:
+    detail = get_instance_detail_by_nickname(nickname)
+    return detail['data']['config']['cwd']
 
 
 def update_instance_by_nickname(nickname: str, config: Dict[str, Any]) -> Dict:

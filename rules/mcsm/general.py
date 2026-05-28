@@ -2,14 +2,14 @@ import time
 
 from lib.chat.context import Context
 from lib.chat.html_renderer import render
-from lib.chat.rules import Command
+from lib.chat.rules import QqCommand
 from lib.html_files.mcsm.general import get_node_status_html, get_dashboard_html
 from lib.mcsmanager import get_remote_node_list, get_overview
 from lib.rule_registry import register
 
 
 @register
-class RemoteNodeData(Command):
+class RemoteNodeData(QqCommand):
     def __init__(self):
         super().__init__('rnd', '远程节点信息', '获取MCSManager的远程节点信息', '/mcsmrnd')
 
@@ -23,7 +23,7 @@ class RemoteNodeData(Command):
         await context.send_message(await render(get_node_status_html(response, request_time)))
 
 @register
-class McsmDashboard(Command):
+class McsmDashboard(QqCommand):
     def __init__(self):
         super().__init__('dsb', 'MCSM数据', '获取MCSManager仪表盘数据', '/mcsm')
 
@@ -36,7 +36,7 @@ class McsmDashboard(Command):
         await context.send_message(await render(get_dashboard_html(response)))
 
 @register
-class DaemonIdList(Command):
+class DaemonIdList(QqCommand):
     def __init__(self):
         super().__init__('did', '节点Daemon ID', '获取所有节点的Daemon ID', '/mcsmdid')
 

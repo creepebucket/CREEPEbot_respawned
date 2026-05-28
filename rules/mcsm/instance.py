@@ -3,7 +3,7 @@ import re
 from lib import logger
 from lib.chat.context import Context
 from lib.chat.html_renderer import render
-from lib.chat.rules import Command
+from lib.chat.rules import QqCommand
 from lib.html_files.mcsm.instance import render_instance_list, get_log_html
 from lib.mcsmanager import get_overview, get_instance_list
 from lib.mcsmanager.instance import start_instance_by_nickname, stop_instance_by_nickname, restart_instance_by_nickname
@@ -13,7 +13,7 @@ from lib.rule_registry import register
 
 
 @register
-class InstanceList(Command):
+class InstanceList(QqCommand):
     def __init__(self):
         super().__init__('lst', '实例列表', '获取 MCSManager 所有实例列表', '/list')
 
@@ -39,7 +39,7 @@ class InstanceList(Command):
 
 
 @register
-class InstanceStart(Command):
+class InstanceStart(QqCommand):
     def __init__(self):
         super().__init__('sta', '启动实例', '启动目标实例', '/start <名称>')
 
@@ -66,7 +66,7 @@ class InstanceStart(Command):
 
 
 @register
-class InstanceStop(Command):
+class InstanceStop(QqCommand):
     def __init__(self):
         super().__init__('stp', '停止实例', '安全停止实例', '/stop <名称>')
 
@@ -93,7 +93,7 @@ class InstanceStop(Command):
 
 
 @register
-class InstanceRestart(Command):
+class InstanceRestart(QqCommand):
     def __init__(self):
         super().__init__('rst', '重启实例', '重新启动实例', '/restart <名称>')
 
@@ -120,7 +120,7 @@ class InstanceRestart(Command):
 
 
 @register
-class InstanceKill(Command):
+class InstanceKill(QqCommand):
     def __init__(self):
         super().__init__('kil', '强制终止', '强制终止实例进程', '/kill <名称>')
 
@@ -147,7 +147,7 @@ class InstanceKill(Command):
 
 
 @register
-class InstanceSend(Command):
+class InstanceSend(QqCommand):
     def __init__(self):
         super().__init__('snd', '发送命令', '向后台发送命令', '/send <名称> <指令>')
 
@@ -179,7 +179,7 @@ class InstanceSend(Command):
 
 
 @register
-class InstanceLog(Command):
+class InstanceLog(QqCommand):
     def __init__(self):
         super().__init__('log', '实例日志', '获取实例输出日志', '/log <名称> <行数>')
 

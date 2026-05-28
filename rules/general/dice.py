@@ -6,11 +6,11 @@ from lib.chat.context import Context
 from lib.chat.html_renderer import render
 from lib.html_files.dice import get_roll_html
 from lib.rule_registry import register
-from lib.chat.rules import Command
+from lib.chat.rules import QqCommand
 
 
 @register
-class Dice(Command):
+class Dice(QqCommand):
     def __init__(self):
         super().__init__('rll', '骰子', '投掷骰子并输出统计卡片（支持 NdM / dM / N 等写法）',
                          '/roll [N]dM | /roll N | /roll')

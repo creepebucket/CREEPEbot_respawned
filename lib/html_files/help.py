@@ -11,8 +11,11 @@ def generate_help_html(commands: list) -> str:
     # 1. 动态生成指令列表的 HTML 行
     cmd_rows_html = ""
     for cmd in commands:
+        if not hasattr(cmd, 'id'): continue
+
         rid = cmd.id if hasattr(cmd, 'id') else cmd.get('id', '?')
         name = cmd.name if hasattr(cmd, 'name') else cmd.get('name', 'UNKNOWN')
+
         usage = cmd.usage if hasattr(cmd, 'usage') else cmd.get('usage', 'UNKNOWN')
         desc = cmd.desc if hasattr(cmd, 'desc') else cmd.get('desc', 'UNKNOWN')
 

@@ -33,8 +33,8 @@ def _load_module_from_path(file_path: Path):
     """
     module_name = None
     parts = file_path.resolve().parts
-    if 'nb_plugins' in parts:
-        i = parts.index('nb_plugins')
+    if 'message_source' in parts:
+        i = parts.index('message_source')
         module_name = '.'.join(parts[i:]).replace('.py', '')
     else:
         relative = file_path.relative_to(file_path.anchor)
@@ -52,12 +52,13 @@ def _load_module_from_path(file_path: Path):
 
 # ---------- 扫描入口 ----------
 def scan_and_register(root_dir: str, pattern: str = "*.py"):
+    global _registry
+    _registry.clear()
+
     """
     递归扫描 root_dir 下所有匹配 pattern 的文件，动态加载并自动注册。
     默认扫描所有 .py 文件，可通过 pattern 过滤（如 "plugin_*.py"）。
     """
-    global _registry
-    _registry.clear()
     root = Path(root_dir).resolve()
     if not root.is_dir():
         raise NotADirectoryError(f"{root_dir} 不是一个有效目录")

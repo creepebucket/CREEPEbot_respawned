@@ -5,7 +5,7 @@ from lib.chat.html_renderer import render
 from lib.html_files.command import get_command_list_html
 from lib.rule_registry import register, get_registry
 
-from lib.chat.rules import Command as CommandBase
+from lib.chat.rules import QqCommand as CommandBase
 
 @register
 class Command(CommandBase):
@@ -24,7 +24,7 @@ class Command(CommandBase):
             await context.send_message('指令格式错误! 使用/help -u /cmd查看详情')
             return False
 
-        if await context.chat_session.get_permission(context.sender.qid) < 1:
+        if await context.chat_session.get_permission(context.sender.name) < 1:
             await context.send_message('/cmd 需要至少1级权限')
             return False
 

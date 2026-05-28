@@ -5,14 +5,14 @@ from lib.chat.context import Context
 from lib.database.config import PersonalConfig
 from lib.rule_registry import register
 
-from lib.chat.rules import Command
+from lib.chat.rules import QqCommand
 
 
 @register
-class SetPermission(Command):
+class SetPermission(QqCommand):
 
     def __init__(self):
-        super().__init__('prm', '设置权限', '设置某人的权限 (可以使用qid或者at), 权限范围0-10', '/perm <qid/at消息> <权限>', bypass_enable_check=True)
+        super().__init__('prm', '设置权限', '设置某人的权限 (可以使用qid或者at), 权限范围0-10', '/perm <name/at消息> <权限>', bypass_enable_check=True)
 
     def check(self, context: Context) -> bool:
         return context.get_message().startswith('/perm')
@@ -40,7 +40,7 @@ class SetPermission(Command):
             re.search(r'/perm (?:\[at:[0-9]+]|[0-9]+) ([0-9]+)', message).group(1)
         )
 
-        sender_perm = await context.chat_session.get_permission(context.sender.qid)
+        sender_perm = await context.chat_session.get_permission(context.sender.name)
 
         if sender_perm <= perm and context.sender.get_role() == 'USER':
             await context.send_message(f'错误: 您只能设置低于自己的权限等级的等级 ({sender_perm})')
@@ -53,10 +53,10 @@ class SetPermission(Command):
 
 
 @register
-class Tag(Command):
+class Tag(QqCommand):
 
     def __init__(self):
-        super().__init__('tag', '设置标签', '设置某人的标签状态 -a: 增加, -d: 移除', '/tag <-a/d> <qid/at消息> <标签>', bypass_enable_check=True)
+        super().__init__('tag', '设置标签', '设置某人的标签状态 -a: 增加, -d: 移除', '/tag <-a/d> <name/at消息> <标签>', bypass_enable_check=True)
 
     def check(self, context: Context) -> bool:
         return context.get_message().startswith('/tag')
@@ -90,10 +90,10 @@ class Tag(Command):
 
 
 @register
-class Role(Command):
+class Role(QqCommand):
 
     def __init__(self):
-        super().__init__('rle', '设置身份', '设置某人为用户/管理员', '/role <qid/at消息> <user/admin>', bypass_enable_check=True)
+        super().__init__('rle', '设置身份', '设置某人为用户/管理员', '/role <name/at消息> <user/admin>', bypass_enable_check=True)
 
     def check(self, context: Context) -> bool:
         return context.get_message().startswith('/role')

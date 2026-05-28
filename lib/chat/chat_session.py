@@ -12,7 +12,7 @@ class ChatSession(MongoConfig):
     聊天会话基类, 用于群聊, 私聊等场景的权限管理和配置
     """
 
-    def __init__(self, session_id: int, session_type: str):
+    def __init__(self, session_id, session_type: str):
         """
         构造函数
         :param session_id: 会话id(群号等)
@@ -28,6 +28,18 @@ class ChatSession(MongoConfig):
 
     def is_private_chat(self) -> bool:
         return self.session_type == 'private'
+
+    def is_mc_chat(self) -> bool:
+        return self.session_type == 'mc_chat'
+
+    def is_chat(self) -> bool:
+        return self.is_mc_chat() or self.is_group_chat() or self.is_private_chat()
+
+    def is_qq_chat(self):
+        return self.is_private_chat() or self.is_group_chat()
+
+    def is_mc_log(self) -> bool:
+        return self.session_type == 'mc_log'
 
     async def get_permission(self, user: int) -> int:
         """
@@ -155,5 +167,3 @@ class ChatSession(MongoConfig):
         """
 
         if self.is_group_chat(): self.set(f'command_statuses/{command}', status)
-
-

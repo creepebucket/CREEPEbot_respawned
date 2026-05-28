@@ -13,7 +13,7 @@ cache_collection: Collection = None
 def connect_database(connection: str):
     global mongo_client, database, cache_collection
     mongo_client = MongoClient(connection)
-    database = mongo_client['creepebot_respawned']
+    database = mongo_client['rules']
 
     cache_collection = database['cache']
 

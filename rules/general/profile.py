@@ -6,14 +6,14 @@ from lib.database.config import PersonalConfig
 from lib.html_files.profile import get_profile_html
 from lib.rule_registry import register
 
-from lib.chat.rules import Command
+from lib.chat.rules import QqCommand
 
 
 @register
-class Me(Command):
+class Me(QqCommand):
 
     def __init__(self):
-        super().__init__('prf', '个人信息', '显示某人的权限等级和标签信息(默认显示自己的)', '/profile [qid/at消息]', bypass_enable_check=True)
+        super().__init__('prf', '个人信息', '显示某人的权限等级和标签信息(默认显示自己的)', '/profile [name/at消息]', bypass_enable_check=True)
 
     def check(self, context: Context) -> bool:
         return context.get_message().startswith('/profile')
@@ -30,9 +30,9 @@ class Me(Command):
             query = PersonalConfig(int(re.search(r'/profile \[at:([0-9]+)', message).group(1)))
 
             await context.send_message(await render(get_profile_html(
-                query.qid,
+                query.name,
                 context.chat_session.session_id,
-                await context.chat_session.get_permission(query.qid),
+                await context.chat_session.get_permission(query.name),
                 query.get_role(),
                 query.get_tags()
             )))
@@ -40,9 +40,9 @@ class Me(Command):
             return False
 
         await context.send_message(await render(get_profile_html(
-                    context.sender.qid,
+                    context.sender.name,
                     context.chat_session.session_id,
-              await context.chat_session.get_permission(context.sender.qid),
+              await context.chat_session.get_permission(context.sender.name),
                     context.sender.get_role(),
                     context.sender.get_tags()
         )))

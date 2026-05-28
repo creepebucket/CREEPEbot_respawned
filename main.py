@@ -5,13 +5,13 @@ from typing import Dict, Any
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
 
+from message_source.mc import start_sync
 from lib import logger, database
 from lib.database import config, cache
 from lib.database.config import set_toml_config
 from lib.mcsmanager import set_api_key, set_base_url
 from lib.mcsmanager.instance import rebuild_instance_nickname_cache
 from lib.rule_registry import scan_and_register, get_registry
-from nb_plugins.creepebot_respawned.chat_sync import start_sync
 
 banner = r'''
    __________  ________________  ________          __ 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     logger.info('CREEPEbot respawned **堂堂复活**! 孩子们我回来了')
 
     # 注册事件处理规则
-    scan_and_register('./nb_plugins/creepebot_respawned')
+    scan_and_register('rules')
     logger.info(f'已配置 `{len(get_registry())}` 条事件处理规则')
 
     # nb2, 启动!
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     driver.register_adapter(Adapter)
     nonebot.load_builtin_plugins('echo')  # 内置插件
-    nonebot.load_plugins('nb_plugins')  # 本地插件
+    nonebot.load_plugin('message_source.qq')  # 本地插件
 
     logger.info('nonebot已启动')
 

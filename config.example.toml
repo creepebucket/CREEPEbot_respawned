@@ -1,5 +1,6 @@
 
 [database]
+# 你的数据库连接
 mongo_connection_string = "mongodb://user:password@ip:port/"
 
 [nonebot]
@@ -20,6 +21,6 @@ superusers = [1111111111, 1234567890]
 # MCSManager配置
 # [mcsm]
 # 面板的url, 格式不可以改动(比如少加多加https或者后面的/什么的
-# base_url = "https://127.0.0.1:23333/"
+# base_url = "http://127.0.0.1:23333/"
 # 你的API key
 # key = "YOUR_KEY"

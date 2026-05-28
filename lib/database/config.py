@@ -13,7 +13,7 @@ config_collection: Collection = None
 def connect_database(connection: str):
     global mongo_client, database, config_collection
     mongo_client = MongoClient(connection)
-    database = mongo_client['creepebot_respawned']
+    database = mongo_client['rules']
 
     # 加载各集合
     config_collection = database['config']
@@ -89,10 +89,10 @@ class PersonalConfig(MongoConfig):
     用户信息
     """
 
-    def __init__(self, qid: int):
-        super().__init__(f'local_user_{qid}')
+    def __init__(self, name):
+        super().__init__(f'local_user_{name}')
 
-        self.qid = qid
+        self.name = name
 
     def get_tags(self) -> List:
         """
@@ -143,7 +143,7 @@ class PersonalConfig(MongoConfig):
         :return: 等级
         """
 
-        if self.qid in toml_config_dict['general']['superusers']:
+        if self.name in toml_config_dict['general']['superusers']:
             return 'SUPER_ADMIN'
 
         return self.get('role', 'USER')

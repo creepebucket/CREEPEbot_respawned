@@ -5,11 +5,11 @@ from lib.chat.html_renderer import render
 from lib.html_files.help import generate_help_html
 from lib.rule_registry import register, get_registry
 
-from lib.chat.rules import Command
+from lib.chat.rules import QqCommand
 
 
 @register
-class Help(Command):
+class Help(QqCommand):
     def __init__(self):
         super().__init__('hlp', '帮助', '查看帮助, 也可根据关键词进行搜索', '/help [参数] <关键词>', 0, True)
 
@@ -30,7 +30,7 @@ class Help(Command):
             found = []
 
             for rule in get_registry():
-                if not isinstance(rule, Command):
+                if not isinstance(rule, QqCommand):
                     continue
 
                 if 'n' in arg:

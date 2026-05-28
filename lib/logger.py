@@ -77,9 +77,8 @@ def inject_nonebot_logger():
 
         # 加载到插件
         elif message.startswith('Succeeded to load plugin '):
-            plugin = re.search('.*"(.*)".*".*".*', message).group(1)
-            source = re.search('.*".*".*"(.*)".*', message).group(1)
-            log(f'**成功**加载来自 `{source}` 的插件 `{plugin}`', 1, stack)
+            plugin = re.search('.*"(.*)".*', message).group(1)
+            log(f'**成功**加载插件 `{plugin}`', 1, stack)
 
         # bot连接
         elif re.match('OneBot V11 \| Bot (.*) connected', message):

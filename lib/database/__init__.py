@@ -8,11 +8,13 @@ mongo_client: MongoClient = None
 database: Database = None
 
 config_collection: Collection = None
+backup_collection: Collection = None
 
 def connect_database(connection: str):
-    global mongo_client, database, config_collection
+    global mongo_client, database, config_collection, backup_collection
     mongo_client = MongoClient(connection)
-    database = mongo_client['creepebot_respawned']
+    database = mongo_client['rules']
 
     # 加载各集合
     config_collection = database['config']
+    backup_collection = database['backup']
