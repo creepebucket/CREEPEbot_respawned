@@ -1,12 +1,13 @@
 import asyncio
 import os
+import re
 import time
 
 from lib import logger
 from lib.backup import start_backup, list_backup, BACKUP_DIRNAME, MANIFEST_DIRNAME
 from lib.database import backup_collection
 from lib.database.config import global_config
-from lib.mcsmanager.instance import get_instance_cwd_by_nickname
+from lib.mcsmanager.instance import get_instance_cwd_by_nickname, get_instance_detail_by_nickname, get_output_log_by_nickname
 
 
 def get_auto_backup_tasks():
@@ -78,6 +79,20 @@ def get_auto_backup_task(nickname: str):
     return None
 
 
+def get_online_player_count(nickname: str) -> int:
+    detail = get_instance_detail_by_nickname(nickname)
+    current_players = detail['data']['info'].get('currentPlayers', -1)
+    if current_players >= 0:
+        return current_players
+
+    log_resp = get_output_log_by_nickname(nickname)
+    log_text = log_resp['data']
+    match = re.search(r'There are (\d+) of a max of \d+ players online', log_text)
+    if match:
+        return int(match.group(1))
+    return 0
+
+
 def format_auto_backup_task(task):
     if task is None:
         return '未配置自动备份'
@@ -132,7 +147,20 @@ async def _auto_backup_loop():
                 continue
 
             nickname = task['nickname']
+            logger.info(f'自动备份触发: {nickname}')
             try:
+                online_count = await asyncio.to_thread(get_online_player_count, nickname)
+                if online_count <= 0:
+                    logger.info(f'自动备份跳过: {nickname} 没有在线玩家')
+                    next_time = int(time.time()) + int(task['interval_min']) * 60
+                    tasks = get_auto_backup_tasks()
+                    for t in tasks:
+                        if t['nickname'] == nickname:
+                            t['next_time'] = next_time
+                            break
+                    set_auto_backup_tasks(tasks)
+                    continue
+
                 doc = await run_auto_backup_now(nickname)
                 logger.info(f'自动备份完成: {nickname} {doc["time"]} {doc["name"]}')
             except Exception as e:
