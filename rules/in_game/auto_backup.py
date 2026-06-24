@@ -24,7 +24,17 @@ class InGameAutoBackup(Rule):
 
         nickname = context.chat_session.session_id
 
-        if message in ('!!aback', '!!aback status'):
+        if message == '!!aback':
+            await context.send_message(
+                '!!aback - 自动备份管理\n'
+                '  !!aback status  查看自动备份状态\n'
+                '  !!aback on <间隔分钟> [保留数量] [前缀]  开启自动备份\n'
+                '  !!aback off     关闭自动备份\n'
+                '  !!aback run     立即执行一次自动备份'
+            )
+            return False
+
+        if message == '!!aback status':
             await context.send_message(format_auto_backup_task(get_auto_backup_task(nickname)))
             return False
 
@@ -61,6 +71,6 @@ class InGameAutoBackup(Rule):
             await context.send_message('已开启自动备份\n' + format_auto_backup_task(task))
             return False
 
-        await context.send_message('用法: !!aback [status] | !!aback on <min> [keep] [prefix] | !!aback off | !!aback run')
+        await context.send_message('未知子命令，输入 !!aback 查看帮助')
         return False
 

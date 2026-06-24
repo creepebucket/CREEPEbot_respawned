@@ -7,7 +7,7 @@ from lib import logger
 from lib.backup import start_backup, list_backup, BACKUP_DIRNAME, MANIFEST_DIRNAME
 from lib.database import backup_collection
 from lib.database.config import global_config
-from lib.mcsmanager.instance import get_instance_cwd_by_nickname, get_instance_detail_by_nickname, get_output_log_by_nickname
+from lib.mcsmanager.instance import get_instance_cwd_by_nickname, get_instance_detail_by_nickname, get_output_log_by_nickname, send_command_by_nickname
 
 
 def get_auto_backup_tasks():
@@ -161,10 +161,13 @@ async def _auto_backup_loop():
                     set_auto_backup_tasks(tasks)
                     continue
 
+                send_command_by_nickname(nickname, '/tellraw @a "[creepebot] 服务器自动备份中，可能会造成短暂卡顿..."')
                 doc = await run_auto_backup_now(nickname)
                 logger.info(f'自动备份完成: {nickname} {doc["time"]} {doc["name"]}')
+                send_command_by_nickname(nickname, f'/tellraw @a "[creepebot] 自动备份完成: {doc["name"]}"')
             except Exception as e:
                 logger.error(f'自动备份失败: {nickname} {type(e).__name__}: {e}')
+                send_command_by_nickname(nickname, '/tellraw @a "[creepebot] 自动备份失败，请看日志"')
 
         await asyncio.sleep(10)
 

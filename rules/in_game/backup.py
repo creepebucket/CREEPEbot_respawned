@@ -20,7 +20,16 @@ class InGameBackup(Rule):
         nickname = context.chat_session.session_id
         cwd = get_instance_cwd_by_nickname(nickname)
 
-        if message in ('!!back', '!!back list'):
+        if message == '!!back':
+            await context.send_message(
+                '!!back - 手动备份管理\n'
+                '  !!back list      查看备份列表（最近5个）\n'
+                '  !!back start <名称>      创建新备份\n'
+                '  !!back restore <时间戳>  恢复到指定备份（会重启服务器）'
+            )
+            return False
+
+        if message == '!!back list':
             backups = list_backup(cwd)
             if len(backups) == 0:
                 await context.send_message('没有备份记录')
@@ -47,5 +56,5 @@ class InGameBackup(Rule):
             await context.send_message(f'恢复完成: {args[2]}')
             return False
 
-        await context.send_message('用法: !!back [list] | !!back start <name> | !!back restore <time>')
+        await context.send_message('未知子命令，输入 !!back 查看帮助')
         return False
