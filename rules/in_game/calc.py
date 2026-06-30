@@ -82,8 +82,8 @@ class InGameCalc(Rule):
 
         result_int = int(result)
         await context.send_message(
-            f'结果: {result_int}\n'
-            f'组数: {format_stack(result_int)}\n'
+            f'结果: {result_int} '
+            f'组数: {format_stack(result_int)} '
             f'流体锭: {format_fluid(result_int)}'
         )
         return False
