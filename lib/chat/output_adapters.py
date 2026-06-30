@@ -26,7 +26,8 @@ class McLogOutputHandler(OutputAdapter):
         self.nickname = nickname
 
     async def send_message(self, message):
-        send_command_by_nickname(self.nickname, f'/tellraw @a "[creepebot] {message}"')
+        for line in message.split('\n'):
+            send_command_by_nickname(self.nickname, f'/tellraw @a "[creepebot] {line}"')
 
 class McMessageOutputAdapter(OutputAdapter):
     def __init__(self, nickname: str, sender: str):
@@ -34,4 +35,5 @@ class McMessageOutputAdapter(OutputAdapter):
         self.sender = sender
 
     async def send_message(self, message):
-        send_command_by_nickname(self.nickname, f'/tellraw {self.sender} "{message}"')
+        for line in message.split('\n'):
+            send_command_by_nickname(self.nickname, f'/tellraw {self.sender} "{line}"')

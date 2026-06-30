@@ -1,5 +1,6 @@
 import operator
 from ast import Expression, BinOp, UnaryOp, Constant, USub, UAdd, parse, NodeVisitor
+from datetime import datetime, timedelta
 
 from lib.chat.context import Context
 from lib.chat.rule import Rule
@@ -61,6 +62,17 @@ def format_fluid(n: int) -> str:
     return f'{stacks}x64x144 + {ingots}x144 + {remainder}'
 
 
+def format_time_line(label: str, real_seconds: int, ticks: int) -> str:
+    DD = real_seconds // 86400
+    HH = (real_seconds % 86400) // 3600
+    MM = (real_seconds % 3600) // 60
+    SS = real_seconds % 60
+    mc_days = ticks // 24000
+    time_str = f'{DD:02d}:{HH:02d}:{MM:02d}:{SS:02d}'
+    eta = (datetime.now() + timedelta(seconds=real_seconds)).strftime('%m-%d %H:%M')
+    return f'§5{label}§r: §e{time_str} §d{ticks}tick§r §3{mc_days}MC日§r §9ETA: §e{eta}§r'
+
+
 @register
 class InGameCalc(Rule):
     def __init__(self):
@@ -84,8 +96,10 @@ class InGameCalc(Rule):
 
         result_int = int(result)
         await context.send_message(
-            f'结果: {result_int} '
-            f'组数: {format_stack(result_int)} '
-            f'流体锭: {format_fluid(result_int)}'
+            f'§6结果§r: {result_int} '
+            f'§a组数§r: {format_stack(result_int)} '
+            f'§b流体锭§r: {format_fluid(result_int)}\n'
+            f'{format_time_line("作为tick", result_int // 20, result_int)}\n'
+            f'{format_time_line("作为秒", result_int, result_int * 20)}'
         )
         return False
