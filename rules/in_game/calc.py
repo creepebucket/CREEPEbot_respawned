@@ -54,9 +54,11 @@ def format_stack(n: int) -> str:
 
 
 def format_fluid(n: int) -> str:
-    ingots = n // 144
-    remainder = n % 144
-    return f'{ingots}x144 + {remainder}'
+    stacks = n // 9216
+    r1 = n % 9216
+    ingots = r1 // 144
+    remainder = r1 % 144
+    return f'{stacks}x64x144 + {ingots}x144 + {remainder}'
 
 
 @register
