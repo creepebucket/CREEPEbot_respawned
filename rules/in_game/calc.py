@@ -1,3 +1,4 @@
+import math
 import operator
 from ast import Expression, BinOp, UnaryOp, Constant, USub, UAdd, parse, NodeVisitor
 from datetime import datetime, timedelta
@@ -94,12 +95,12 @@ class InGameCalc(Rule):
             await context.send_message('算式无效')
             return False
 
-        result_int = int(result)
+        result_ceiled = int(math.ceil(result))
         await context.send_message(
-            f'§6结果§r: {result_int} '
-            f'§a组数§r: {format_stack(result_int)} '
-            f'§b流体锭§r: {format_fluid(result_int)}\n'
-            f'{format_time_line("作为tick", result_int // 20, result_int)}\n'
-            f'{format_time_line("作为秒", result_int, result_int * 20)}'
+            f'§6结果§r: {result:.2f} '
+            f'§a组数§r: {format_stack(result_ceiled)} '
+            f'§b流体锭§r: {format_fluid(result_ceiled)}\n'
+            f'{format_time_line("作为tick", math.ceil(result / 20), result_ceiled)}\n'
+            f'{format_time_line("作为秒", result_ceiled, result_ceiled * 20)}'
         )
         return False
